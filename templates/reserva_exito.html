@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% set active = 'reservar' %}
+{% block content %}
+<section class="booking-confirmation">
+  <div class="wrap-narrow">
+    <article class="confirmation-card">
+      <header class="confirmation-hero">
+        <span class="confirmation-check" aria-hidden="true">✓</span>
+        <p class="confirmation-kicker">Gracias por elegir {{ settings.business_name }}</p>
+        <h1>¡Solicitud recibida!</h1>
+        <p class="confirmation-lead">Guardamos los datos de tu cita. El estudio confirmará tu horario pronto.</p>
+        <div class="confirmation-id"><span>Código de reserva</span><strong>{{ b.id }}</strong></div>
+      </header>
+
+      <section class="confirmation-summary" aria-label="Resumen de la cita">
+        <div class="confirmation-detail service-detail"><span>Servicio</span><strong>{{ b.service_name }}</strong></div>
+        <div class="confirmation-detail"><span>Fecha</span><strong>{{ b.date }}</strong></div>
+        <div class="confirmation-detail"><span>Hora</span><strong>{{ b.time }}</strong></div>
+      </section>
+
+      <div class="confirmation-pending" role="status">
+        <span class="pending-indicator" aria-hidden="true"></span>
+        <div><strong>Estado: pendiente de confirmación</strong><p>Tu solicitud está registrada; espera el mensaje del estudio antes de darla por confirmada.</p></div>
+      </div>
+
+      <div class="confirmation-actions">
+        {% if link %}
+        <div class="whatsapp-reference-alert" role="note">
+          <span class="whatsapp-reference-icon" aria-hidden="true">!</span>
+          <div><strong>Importante: adjunta la imagen de referencia en WhatsApp</strong><p>Al abrir el chat, toca el clip y selecciona la foto del diseño. El botón prepara el mensaje, pero WhatsApp no adjunta archivos automáticamente.{% if not b.reference_image %} Aún no subiste una imagen a la reserva; elige la foto de tu dispositivo y envíala en el chat.{% endif %}</p></div>
+        </div>
+        <a class="btn btn-wa" target="_blank" rel="noopener" href="{{ link }}">Avisar al estudio por WhatsApp</a>
+        {% else %}
+        <p class="confirmation-pending">El WhatsApp del estudio aún no está configurado. Tu solicitud sí quedó guardada.</p>
+        {% endif %}
+        <a class="btn btn-outline" target="_blank" rel="noopener" href="{{ client_link }}">Abrir el resumen en WhatsApp</a>
+        <a class="btn btn-ghost" href="{{ url_for('index') }}">Volver al inicio</a>
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

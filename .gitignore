@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+*.pyc
+.env
+instance/*.db
+static/uploads/services/*
+!static/uploads/services/.gitkeep
+!static/uploads/services/README.txt
+static/uploads/referencias/*
+!static/uploads/referencias/.gitkeep
+
+static/uploads/clientes/*
+!static/uploads/clientes/.gitkeep

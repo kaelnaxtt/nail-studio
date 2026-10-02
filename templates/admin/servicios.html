@@ -1,0 +1,63 @@
+{% extends "admin/base_admin.html" %}
+{% set active = 'servicios' %}
+{% block heading %}Servicios{% endblock %}
+{% block admin_content %}
+<div class="admin-card">
+  <h3>Agregar nuevo servicio</h3>
+  <p class="upload-help">Puedes agregar fotos desde cada servicio. También puedes copiarlas en <code>static/uploads/services/</code> y luego seleccionarlas en la fila correspondiente para asociarlas a su servicio.</p>
+  <form method="POST" action="{{ url_for('admin_servicio_nuevo') }}">
+    <div class="two-col">
+      <div class="field"><label>Nombre</label><input name="name" placeholder="Nombre del servicio" required></div>
+      <div class="field"><label>Categoría</label><input name="category" list="catList" placeholder="Ej. Tradicional">
+        <datalist id="catList">{% for c in categories %}<option value="{{ c }}">{% endfor %}</datalist>
+      </div>
+      <div class="field"><label>Precio (COP)</label><input name="price" type="number" placeholder="50000"></div>
+      <div class="field"><label>Duración (min)</label><input name="duration" type="number" placeholder="60"></div>
+    </div>
+    <div class="field"><label>Descripción</label><textarea name="description" placeholder="Breve descripción del servicio"></textarea></div>
+    <button class="btn btn-primary" type="submit">Agregar servicio</button>
+  </form>
+</div>
+
+{% for c in categories %}
+<div class="admin-card">
+  <h3>{{ c }}</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Duración</th><th>Activo</th><th>Acciones</th></tr></thead>
+    <tbody>
+    {% for s in services if s.category == c %}
+    <tr>
+      <td>
+        {% if s.image %}
+          <img class="svc-thumb" src="{{ url_for('static', filename='uploads/services/' + s.image) }}" alt="">
+        {% else %}
+          <div class="svc-thumb image-slot"><span>Foto de<br>{{ s.name }}<small>static/uploads/services/</small></span></div>
+        {% endif %}
+        <form method="POST" action="{{ url_for('admin_servicio_imagen', sid=s.id) }}" enctype="multipart/form-data" style="margin-top:6px;">
+          <label class="upload-label">Foto de {{ s.name }}</label>
+          <input type="file" name="image" accept="image/*" style="font-size:10px;max-width:150px;">
+          <small class="upload-path">Se guarda en static/uploads/services/</small>
+          <button class="mini-btn" type="submit" style="margin-top:4px;">Subir imagen</button>
+        </form>
+      </td>
+      <td>
+        <form method="POST" action="{{ url_for('admin_servicio_editar', sid=s.id) }}" id="form-{{ s.id }}"></form>
+        <input form="form-{{ s.id }}" name="name" value="{{ s.name }}" style="border:none;background:transparent;width:100%;font-family:inherit;font-size:13.5px;color:var(--ink);">
+      </td>
+      <td><input form="form-{{ s.id }}" name="price" type="number" value="{{ s.price }}" style="border:none;background:transparent;width:90px;font-family:inherit;font-size:13.5px;color:var(--ink);"></td>
+      <td><input form="form-{{ s.id }}" name="duration" type="number" value="{{ s.duration }}" style="border:none;background:transparent;width:60px;font-family:inherit;font-size:13.5px;color:var(--ink);"> min</td>
+      <td><input form="form-{{ s.id }}" type="checkbox" name="active" {% if s.active %}checked{% endif %}></td>
+      <td>
+        <input form="form-{{ s.id }}" type="hidden" name="description" value="{{ s.description }}">
+        <button form="form-{{ s.id }}" class="mini-btn ok" type="submit">Guardar</button>
+        <form class="inline-form" method="POST" action="{{ url_for('admin_servicio_eliminar', sid=s.id) }}" onsubmit="return confirm('¿Eliminar este servicio?');">
+          <button class="mini-btn danger" type="submit">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</div>
+{% endfor %}
+{% endblock %}

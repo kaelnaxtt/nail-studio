@@ -1,0 +1,83 @@
+{% extends "admin/base_admin.html" %}
+{% set active = 'galeria' %}
+{% block heading %}Galería{% endblock %}
+{% block admin_content %}
+<div class="admin-card">
+  <h3>Subir fotos (puedes seleccionar varias a la vez)</h3>
+  <form method="POST" action="{{ url_for('admin_galeria_subir') }}" enctype="multipart/form-data" id="bulkForm">
+    <div class="field">
+      <label>Selecciona las fotos</label>
+      <p class="upload-path">Las fotos se organizan en static/uploads/gallery/original/ y sus miniaturas en static/uploads/gallery/thumb/. Súbelas desde aquí para que queden registradas en la base de datos.</p>
+      <input type="file" name="images" id="bulkFiles" accept="image/*" multiple required>
+      <p class="help-text" id="fileCount">Ningún archivo seleccionado. Máximo 40 fotos por lote — si tienes más, súbelas en varias tandas.</p>
+    </div>
+    <div class="two-col">
+      <div class="field"><label>Categoría (opcional, aplica a todas las fotos de este lote)</label>
+        <input name="category" list="galCatList" placeholder="Ej. Semipermanente, Acrílico, Nail art...">
+        <datalist id="galCatList">{% for c in categories %}<option value="{{ c }}">{% endfor %}</datalist>
+      </div>
+      <div class="field"><label>Asociar a un servicio (opcional)</label>
+        <select name="service_id">
+          <option value="">— Ninguno —</option>
+          {% for s in services %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Descripción (opcional, aplica a todas las fotos de este lote)</label><input name="caption" placeholder="Ej. Diseño floral en tonos pastel"></div>
+    <button class="btn btn-primary" type="submit" id="bulkSubmitBtn">Subir fotos</button>
+  </form>
+  <p class="help-text" style="margin-top:10px;">
+    Tip: si tienes fotos guardadas de Instagram, descárgalas al celular o computador primero
+    (esta app no puede traerlas automáticamente desde Instagram) y luego selecciónalas todas
+    aquí de una vez. Cada foto se optimiza automáticamente para que la web cargue rápido en celular.
+  </p>
+</div>
+
+<div class="admin-card">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:10px;">
+    <h3 style="margin:0;">Fotos ({{ images|length }})</h3>
+    <div class="filters" style="margin:0;">
+      <a href="{{ url_for('admin_galeria') }}" class="chip {{ 'active' if active_cat=='Todos' else '' }}">Todos</a>
+      {% for c in categories %}
+      <a href="{{ url_for('admin_galeria', categoria=c) }}" class="chip {{ 'active' if c==active_cat else '' }}">{{ c }}</a>
+      {% endfor %}
+    </div>
+  </div>
+  {% if images|length == 0 %}
+    <div class="empty-state upload-empty"><strong>Espacio para fotos de uñas</strong><span>Sube imágenes con el formulario de arriba. Carpeta: <code>static/uploads/gallery/original/</code></span></div>
+  {% else %}
+  <div class="gallery-admin-grid">
+    {% for g in images %}
+    <div class="gallery-admin-card">
+      <img src="{{ url_for('static', filename='uploads/gallery/thumb/' + g.thumb_filename) }}" alt="">
+      <form method="POST" action="{{ url_for('admin_galeria_editar', gid=g.id) }}" class="gallery-admin-form">
+        <input name="category" value="{{ g.category }}" placeholder="Categoría" list="galCatList">
+        <input name="caption" value="{{ g.caption }}" placeholder="Descripción">
+        <label class="gallery-admin-active"><input type="checkbox" name="active" {% if g.active %}checked{% endif %}> Visible</label>
+        <button class="mini-btn ok" type="submit">Guardar</button>
+      </form>
+      <form method="POST" action="{{ url_for('admin_galeria_eliminar', gid=g.id) }}" onsubmit="return confirm('¿Eliminar esta foto?');">
+        <button class="mini-btn danger" type="submit" style="width:100%;">Eliminar</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.getElementById('bulkFiles').addEventListener('change', function (e) {
+  const n = e.target.files.length;
+  document.getElementById('fileCount').textContent = n
+    ? n + ' foto(s) seleccionada(s).'
+    : 'Ningún archivo seleccionado. Máximo 40 fotos por lote.';
+});
+document.getElementById('bulkForm').addEventListener('submit', function () {
+  const btn = document.getElementById('bulkSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Subiendo, un momento…';
+});
+</script>
+{% endblock %}

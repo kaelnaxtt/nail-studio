@@ -1,0 +1,76 @@
+{% extends "admin/base_admin.html" %}
+{% set active = 'horarios' %}
+{% block heading %}Horarios y disponibilidad{% endblock %}
+{% block admin_content %}
+{% set dow_py = [('Lun',0),('Mar',1),('Mié',2),('Jue',3),('Vie',4),('Sáb',5),('Dom',6)] %}
+<div class="admin-card">
+  <h3>Días laborales</h3>
+  <form method="POST" action="{{ url_for('admin_horarios_guardar') }}" id="hoursForm">
+    <div class="dow-toggle">
+      {% for label, num in dow_py %}
+      <label><input type="checkbox" name="work_days" value="{{ num }}" {% if num in settings.work_days %}checked{% endif %}><span>{{ label }}</span></label>
+      {% endfor %}
+    </div>
+  </form>
+</div>
+<div class="admin-card">
+  <h3>Horario de atención</h3>
+  <div class="two-col">
+    <div class="field"><label>Hora de inicio</label><input form="hoursForm" name="work_start" type="time" value="{{ settings.work_start }}"></div>
+    <div class="field"><label>Hora de cierre</label><input form="hoursForm" name="work_end" type="time" value="{{ settings.work_end }}"></div>
+  </div>
+  <div class="field"><label>Duración de cada turno (minutos)</label><input form="hoursForm" name="slot_duration" type="number" value="{{ settings.slot_duration }}"></div>
+  <button class="btn btn-primary" form="hoursForm" type="submit">Guardar horario</button>
+</div>
+
+<div class="admin-card">
+  <h3>Días no disponibles</h3>
+  <form method="POST" action="{{ url_for('admin_dia_bloqueado_agregar') }}" style="display:flex;gap:10px;">
+    <input name="fecha" type="date" style="max-width:200px;">
+    <button class="btn btn-outline btn-sm" type="submit">Agregar</button>
+  </form>
+  <div class="tag-list">
+    {% for d in settings.blocked_dates %}
+    <span class="tagx">{{ d }}
+      <form class="inline-form" method="POST" action="{{ url_for('admin_dia_bloqueado_eliminar', fecha=d) }}"><button type="submit">×</button></form>
+    </span>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="admin-card">
+  <h3>Vacaciones</h3>
+  <form method="POST" action="{{ url_for('admin_vacaciones_agregar') }}">
+    <div class="two-col">
+      <div class="field"><label>Desde</label><input name="inicio" type="date"></div>
+      <div class="field"><label>Hasta</label><input name="fin" type="date"></div>
+    </div>
+    <button class="btn btn-outline btn-sm" type="submit">Agregar periodo</button>
+  </form>
+  <div class="tag-list">
+    {% for v in settings.vacations %}
+    <span class="tagx">{{ v.start }} → {{ v.end }}
+      <form class="inline-form" method="POST" action="{{ url_for('admin_vacaciones_eliminar', idx=loop.index0) }}"><button type="submit">×</button></form>
+    </span>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="admin-card">
+  <h3>Bloquear horario específico</h3>
+  <form method="POST" action="{{ url_for('admin_slot_bloqueado_agregar') }}">
+    <div class="two-col">
+      <div class="field"><label>Fecha</label><input name="fecha" type="date"></div>
+      <div class="field"><label>Hora</label><input name="hora" type="time"></div>
+    </div>
+    <button class="btn btn-outline btn-sm" type="submit">Bloquear</button>
+  </form>
+  <div class="tag-list">
+    {% for b in settings.blocked_slots %}
+    <span class="tagx">{{ b.date }} {{ b.time }}
+      <form class="inline-form" method="POST" action="{{ url_for('admin_slot_bloqueado_eliminar', idx=loop.index0) }}"><button type="submit">×</button></form>
+    </span>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

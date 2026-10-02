@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Política de cookies — {{ settings.business_name }}{% endblock %}
+{% block content %}
+<section class="legal-page"><div class="wrap-narrow">
+  <header class="legal-heading"><span class="editorial-kicker">INFORMACIÓN DEL SITIO</span><h1>Política de cookies</h1><p>Información sencilla sobre los datos que este sitio guarda en tu navegador.</p></header>
+  <article class="legal-card">
+    <h2>Cookies técnicas necesarias</h2>
+    <p>Este sitio utiliza la cookie de sesión de Flask para conservar temporalmente el inicio de sesión y permitir funciones como el acceso al perfil o al panel de administración. Es necesaria para el funcionamiento de la aplicación y no se utiliza para publicidad.</p>
+    <h2>Medición y publicidad</h2>
+    <p>La aplicación no instala actualmente cookies propias de analítica ni de publicidad. Al elegir “Continuar con Google”, Google puede tratar datos y usar tecnologías propias en sus páginas; ese acceso es opcional y está sujeto a las políticas de Google.</p>
+    <h2>Cómo controlar las cookies</h2>
+    <p>Puedes borrar o bloquear cookies desde los ajustes de tu navegador. Si bloqueas la cookie de sesión, algunas funciones como iniciar sesión o administrar tu perfil podrían dejar de funcionar correctamente.</p>
+    <h2>Contacto</h2>
+    <p>Si tienes preguntas sobre el uso de datos del sitio, comunícate con {{ settings.business_name }} por los canales de contacto publicados en esta página.</p>
+  </article>
+  <div class="legal-actions"><a class="btn btn-ghost" href="{{ url_for('terminos') }}">Leer términos y condiciones</a><a class="btn btn-primary" href="{{ url_for('index') }}">Volver al inicio</a></div>
+</div></section>
+{% endblock %}

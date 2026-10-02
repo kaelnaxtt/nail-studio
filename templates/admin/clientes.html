@@ -1,0 +1,19 @@
+{% extends "admin/base_admin.html" %}
+{% set active = 'clientes' %}
+{% block heading %}Clientes{% endblock %}
+{% block admin_content %}
+<div class="table-wrap"><table>
+  <thead><tr><th>Nombre</th><th>Teléfono</th><th>N° citas</th><th>Última cita</th><th>Próxima cita</th><th></th></tr></thead>
+  <tbody>
+  {% for c in clients %}
+    <tr>
+      <td>{{ c.name }}</td><td>{{ c.phone }}</td><td>{{ c.count }}</td>
+      <td>{{ c.last }}</td><td>{{ c.next }}</td>
+      <td><a class="mini-btn" href="{{ url_for('admin_cliente_detalle', telefono=c.key) }}">Ver</a></td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6" style="text-align:center;color:var(--mocha-dark);padding:30px;">Aún no hay clientes registrados.</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

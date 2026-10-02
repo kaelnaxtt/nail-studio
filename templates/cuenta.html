@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Mi perfil' if client else 'Mi cuenta' }} — {{ settings.business_name }}{% endblock %}
+{% block content %}
+<section class="account-page">
+  <div class="wrap account-shell">
+    <div class="account-art">
+      {% if gallery_images %}
+      <div class="account-photo-grid" aria-label="Diseños recientes de la galería">
+        {% for photo in gallery_images %}
+        <img class="account-photo account-photo-{{ loop.index }}" src="{{ url_for('static', filename='uploads/gallery/thumb/' + photo.thumb_filename) }}" alt="{{ photo.caption or 'Diseño de uñas de la galería' }}" {% if not loop.first %}loading="lazy"{% endif %}>
+        {% endfor %}
+      </div>
+      {% else %}<img src="{{ url_for('static', filename='images/nail-editorial.svg') }}" alt="Ilustración de manicure y uñas decoradas">{% endif %}
+      <div><span>AURA</span><h1>{{ 'Un perfil a tu estilo' if client else 'Tu espacio en Aura' }}</h1><p>Guarda tus preferencias y consulta tus próximas visitas al estudio.</p></div>
+    </div>
+    {% if client %}
+    <div class="account-content">
+      <div class="section-head account-heading"><h2>Mi perfil</h2><p>Personaliza cómo preparamos tu próxima cita.</p></div>
+      <form class="card account-form" method="POST" action="{{ url_for('perfil') }}" enctype="multipart/form-data">
+        <div class="field"><label>Nombre completo</label><input name="name" value="{{ client.name }}" autocomplete="name" required minlength="2" maxlength="100"></div>
+        <div class="profile-photo-field">
+          {% if client.avatar %}<img class="profile-photo-preview" src="{{ url_for('static', filename='uploads/clientes/' + client.avatar) }}" alt="Foto actual de perfil">
+          {% else %}<span class="profile-photo-preview profile-photo-initial">{{ client.name[:1]|upper }}</span>{% endif %}
+          <div class="field"><label for="clientAvatar">Foto de perfil</label><input id="clientAvatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><small class="field-hint">Elige una foto para que aparezca junto a tu nombre.</small></div>
+        </div>
+        <div class="field"><label>Correo electrónico</label><input value="{{ client.email }}" type="email" disabled></div>
+        <div class="field"><label>WhatsApp</label><input name="phone" value="{{ client.phone[2:] if client.phone.startswith('57') else client.phone }}" type="tel" autocomplete="tel" minlength="10" maxlength="16" required></div>
+        <div class="field"><label>Estilos que te gustan</label><textarea name="preferred_style" maxlength="300" placeholder="Ej. francesa, minimalista, flores...">{{ client.preferred_style }}</textarea></div>
+        <div class="field"><label>Color favorito</label><input name="favorite_color" value="{{ client.favorite_color }}" maxlength="80" placeholder="Ej. nude rosado"></div>
+        <button class="btn btn-primary" type="submit">Guardar perfil</button>
+      </form>
+      <div class="account-bookings"><div class="section-head"><h2>Mis citas</h2></div>
+        {% if bookings %}<div class="account-booking-list">{% for b in bookings %}<article class="account-booking"><div><strong>{{ b.service_name }}</strong><span>{{ b.date }} · {{ b.time }}</span></div><span class="badge-status st-{{ b.status }}">{{ b.status }}</span></article>{% endfor %}</div>
+        {% else %}<p class="account-empty">Todavía no tienes citas asociadas a este perfil. <a href="{{ url_for('reservar') }}">Agenda tu primera visita.</a></p>{% endif %}
+      </div>
+      <a class="account-logout" href="{{ url_for('logout') }}">Cerrar sesión</a>
+    </div>
+    {% else %}
+    <div class="account-content">
+      <div class="section-head account-heading"><h2>Inicia sesión</h2><p>Entra para guardar tus preferencias y ver tus citas.</p></div>
+      <form class="card account-form" method="POST" action="{{ url_for('cuenta') }}">
+        <input type="hidden" name="action" value="login">
+        <div class="field"><label>Correo electrónico</label><input name="identity" type="email" autocomplete="username" placeholder="tucorreo@ejemplo.com" required></div>
+        <div class="field"><label>Contraseña</label><input name="password" type="password" autocomplete="current-password" required></div>
+        <button class="btn btn-primary btn-block" type="submit">Ingresar</button>
+      </form>
+      <a class="google-login-btn" href="{{ url_for('google_login', next=request.args.get('next', '')) }}"><span class="google-mark" aria-hidden="true">G</span>Continuar con Google</a>
+      <details class="account-register"><summary>¿Primera vez? Crea tu perfil</summary>
+        <form class="card account-form" method="POST" action="{{ url_for('cuenta') }}">
+          <input type="hidden" name="action" value="register">
+          <div class="field"><label>Nombre completo</label><input name="name" autocomplete="name" minlength="2" maxlength="100" required></div>
+          <div class="field"><label>Correo electrónico</label><input name="identity" type="email" autocomplete="email" required></div>
+          <div class="field"><label>WhatsApp</label><input name="phone" type="tel" autocomplete="tel" inputmode="tel" minlength="10" maxlength="16" placeholder="3001234567" required></div>
+          <div class="field"><label>Contraseña (mínimo 8 caracteres)</label><input name="password" type="password" autocomplete="new-password" minlength="8" required></div>
+          <div class="field"><label>Confirma tu contraseña</label><input name="password2" type="password" autocomplete="new-password" minlength="8" required></div>
+          <button class="btn btn-primary btn-block" type="submit">Crear mi perfil</button>
+        </form>
+      </details>
+
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

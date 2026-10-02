@@ -1,0 +1,68 @@
+{% extends "admin/base_admin.html" %}
+{% set active = 'config' %}
+{% block heading %}Configuración{% endblock %}
+{% block admin_content %}
+<div class="admin-card">
+  <h3>Información del negocio</h3>
+  <form method="POST" action="{{ url_for('admin_config_negocio') }}">
+    <div class="two-col">
+      <div class="field"><label>Nombre del negocio</label><input name="business_name" value="{{ settings.business_name }}"></div>
+      <div class="field"><label>Subtítulo</label><input name="business_suffix" value="{{ settings.business_suffix }}"></div>
+    </div>
+    <div class="field"><label>Frase / tagline</label><input name="tagline" value="{{ settings.tagline }}"></div>
+    <div class="two-col">
+      <div class="field"><label>Dirección (opcional)</label><input name="address" value="{{ settings.address }}"></div>
+      <div class="field"><label>Instagram (opcional)</label><input name="instagram" value="{{ settings.instagram }}" placeholder="@tunegocio"></div>
+    </div>
+    <div class="field"><label>Título del inicio</label><input name="hero_title" value="{{ settings.hero_title }}"></div>
+    <div class="field"><label>Subtítulo del inicio</label><textarea name="hero_subtitle">{{ settings.hero_subtitle }}</textarea></div>
+    <button class="btn btn-primary" type="submit">Guardar información</button>
+  </form>
+</div>
+
+<div class="admin-card">
+  <h3>WhatsApp — modo básico (activo ahora)</h3>
+  <form method="POST" action="{{ url_for('admin_config_whatsapp') }}">
+    <div class="field"><label>Número del negocio (con código de país, solo números)</label>
+      <input name="owner_whatsapp" value="{{ settings.owner_whatsapp }}" placeholder="Ej. 573001234567">
+    </div>
+    <p class="help-text">Este es el número que recibe las solicitudes de cita mediante enlaces wa.me (funciona sin costo ni aprobación de Meta).</p>
+
+    <h4 style="margin-top:22px;font-size:15px;color:var(--gold);">WhatsApp — chatbot / envío automático (opcional, requiere Meta)</h4>
+    <p class="help-text">
+      Para que los mensajes se envíen solos (sin que nadie toque un botón) y para que el chatbot
+      responda comandos como "agenda hoy", necesitas una cuenta de WhatsApp Business Platform
+      verificada por Meta. Cuando la tengas, pega aquí tus credenciales de
+      <a href="https://developers.facebook.com/" target="_blank" rel="noopener" style="color:var(--gold);">developers.facebook.com</a>.
+      Mientras estos campos estén vacíos, el sistema sigue funcionando con los enlaces wa.me.
+    </p>
+    <div class="two-col">
+      <div class="field"><label>Access Token (permanente)</label><input name="wa_cloud_token" value="{{ settings.wa_cloud_token }}" type="password" placeholder="EAAG..."></div>
+      <div class="field"><label>Phone Number ID</label><input name="wa_cloud_phone_id" value="{{ settings.wa_cloud_phone_id }}" placeholder="1029384756"></div>
+    </div>
+    <div class="field"><label>Verify Token del webhook</label><input name="wa_verify_token" value="{{ settings.wa_verify_token }}"></div>
+    <div class="field"><label>URL del webhook (regístrala en Meta)</label><input value="{{ webhook_url }}" readonly onclick="this.select()"></div>
+    <p class="help-text">Nota: Meta exige que esta URL sea pública y use HTTPS — no funcionará apuntando a tu computador local (localhost). Necesitarás desplegar la app en un servidor con dominio propio.</p>
+    <button class="btn btn-primary" type="submit">Guardar configuración de WhatsApp</button>
+  </form>
+</div>
+
+<div class="admin-card">
+  <h3>Seguridad</h3>
+  <form method="POST" action="{{ url_for('admin_config_password') }}">
+    <div class="field"><label>Nueva contraseña</label><input name="new_password" type="password" placeholder="Dejar vacío para no cambiar"></div>
+    <div class="field"><label>Confirmar nueva contraseña</label><input name="new_password2" type="password"></div>
+    <button class="btn btn-outline" type="submit">Actualizar contraseña</button>
+  </form>
+</div>
+
+<div class="admin-card">
+  <h3>Acerca de esta plataforma</h3>
+  <p class="help-text">
+    Toda la información (citas, clientes, servicios) vive en una base de datos SQLite real en el
+    servidor — no en el navegador — así que ya se sincroniza automáticamente entre el celular de
+    una clienta y tu computador. El envío automático de WhatsApp y el chatbot son opcionales y
+    requieren credenciales reales de Meta Business, tal como se explica arriba.
+  </p>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "admin/base_admin.html" %}
+{% set active = 'dashboard' %}
+{% block heading %}Dashboard{% endblock %}
+{% block admin_content %}
+<div class="kpi-grid">
+  {% for label, n in kpis %}
+  <div class="kpi"><div class="n">{{ n }}</div><div class="l">{{ label|upper }}</div></div>
+  {% endfor %}
+</div>
+<div class="admin-card">
+  <h3>Solicitudes recientes</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Cliente</th><th>Servicio</th><th>Fecha</th><th>Hora</th><th>Estado</th></tr></thead>
+    <tbody>
+    {% for b in recent %}
+      <tr>
+        <td>{{ b.client_name }}</td>
+        <td>{{ services_by_id.get(b.service_id, {}).get('name', b.service_name) }}</td>
+        <td>{{ b.date }}</td><td>{{ b.time }}</td>
+        <td><span class="badge-status st-{{ b.status }}">{{ b.status|replace('_',' ') }}</span></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" style="text-align:center;color:var(--mocha-dark);">Aún no hay solicitudes de cita.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% set active = 'catalogo' %}
+{% block content %}
+<section class="catalog-page" style="padding-top:44px;">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Nuestro catálogo</h2>
+      <div class="divider-mini"></div>
+      <p>Servicios y precios vigentes. Los valores no incluyen adicionales.</p>
+    </div>
+    <div class="filters">
+      {% for c in categories %}
+      <a href="{{ url_for('catalogo', categoria=c) }}" class="chip {{ 'active' if c==active_cat else '' }}">{{ c }}</a>
+      {% endfor %}
+    </div>
+    <div class="svc-grid">
+      {% for s in services %}
+      <div class="svc-card">
+        <div class="svc-media">
+          {% if s.image %}
+            <img src="{{ url_for('static', filename='uploads/services/' + s.image) }}" alt="{{ s.name }}">
+          {% else %}
+            <img src="{{ url_for('static', filename='images/nail-editorial.svg') }}" alt="Ilustración de uñas decoradas para {{ s.name }}" loading="lazy">
+          {% endif %}
+        </div>
+        <div class="svc-body">
+          <span class="svc-cat">{{ s.category|upper }}</span>
+          <div class="svc-name">{{ s.name }}</div>
+          <p class="svc-desc">{{ s.description }}</p>
+          <div class="svc-price-row">
+            <span class="svc-price">{% if s.price_note %}<small>{{ s.price_note }}</small> {% endif %}${{ '{:,.0f}'.format(s.price).replace(',', '.') }}</span>
+            <span class="svc-dur">{{ s.duration }} min aprox.</span>
+          </div>
+          <div class="svc-actions">
+            <a href="{{ url_for('servicio_detalle', sid=s.id) }}" class="btn btn-ghost btn-sm">Detalles</a>
+            <a href="{{ url_for('reservar', service=s.id) }}" class="btn btn-primary btn-sm">Agendar</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% if services|length == 0 %}<div class="empty-state">No hay servicios en esta categoría por ahora.</div>{% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Términos y condiciones — {{ settings.business_name }}{% endblock %}
+{% block content %}
+<section class="legal-page"><div class="wrap-narrow">
+  <header class="legal-heading"><span class="editorial-kicker">INFORMACIÓN DEL SERVICIO</span><h1>Términos y condiciones</h1><p>Lee cómo funcionan las solicitudes de cita y la información que compartes con el estudio.</p></header>
+  <article class="legal-card">
+    <h2>Solicitudes y confirmación de citas</h2>
+    <p>Enviar el formulario registra una solicitud, pero no confirma por sí solo la cita. El estudio debe confirmar la fecha y la hora; la clienta debe esperar esa confirmación antes de considerar la reserva definitiva.</p>
+    <h2>Servicios y precios</h2>
+    <p>Los servicios y precios publicados son orientativos. Como se informa en las políticas del servicio, el valor final puede variar según el largo, el diseño, el estado de las uñas y el producto que ya tengan. El estudio comunicará el valor final antes de iniciar el procedimiento.</p>
+    <h2>Abono, cambios y cancelaciones</h2>
+    <p>La política publicada por el estudio indica un abono de $30.000 para confirmar la cita y solicita avisar cancelaciones con al menos 48 horas de anticipación. Consulta la página de <a href="{{ url_for('politicas') }}">Políticas del servicio</a> y confirma las condiciones directamente con el estudio antes de realizar un pago. Estas condiciones no eliminan los derechos que correspondan conforme a la ley aplicable.</p>
+    <h2>Datos e imágenes</h2>
+    <p>El nombre, correo, teléfono, preferencias e imágenes enviados se usan para gestionar la solicitud y la atención de la clienta. La imagen de referencia se guarda con la cita para que el estudio la revise. Si contactas por WhatsApp, el enlace prepara un mensaje pero no adjunta automáticamente los archivos seleccionados.</p>
+    <h2>Contacto</h2>
+    {% if settings.owner_whatsapp %}<p>Para consultas, cambios o solicitudes relacionadas con una cita, comunícate con el estudio por <a href="{{ wa_link(settings.owner_whatsapp, 'Hola, tengo una consulta sobre los términos del servicio') }}" target="_blank" rel="noopener">WhatsApp</a>.</p>{% else %}<p>Para consultas, utiliza los canales de contacto publicados por el estudio.</p>{% endif %}
+  </article>
+  <div class="legal-actions"><a class="btn btn-ghost" href="{{ url_for('cookies') }}">Política de cookies</a><a class="btn btn-primary" href="{{ url_for('reservar') }}">Agendar una cita</a></div>
+</div></section>
+{% endblock %}

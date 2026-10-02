@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% set active = 'catalogo' %}
+{% block content %}
+<section style="padding-top:44px;">
+  <div class="wrap-narrow">
+    <div class="detail-hero">
+      {% if s.image %}
+        <img src="{{ url_for('static', filename='uploads/services/' + s.image) }}" alt="{{ s.name }}">
+      {% else %}
+        <img src="{{ url_for('static', filename='images/nail-editorial.svg') }}" alt="Diseño de uñas para {{ s.name }}">
+      {% endif %}
+    </div>
+    <span class="svc-cat">{{ s.category|upper }}</span>
+    <h1 style="margin-top:6px;">{{ s.name }}</h1>
+    <p style="color:var(--mocha-dark);margin-top:12px;">{{ s.description }}</p>
+    <div class="detail-grid">
+      <div class="card">
+        <h3 style="font-size:18px;">Detalles del servicio</h3>
+        <div class="summary-row"><span>Precio</span><b>{% if s.price_note %}{{ s.price_note }} {% endif %}${{ '{:,.0f}'.format(s.price).replace(',', '.') }}</b></div>
+        <div class="summary-row"><span>Duración estimada</span><b>{{ s.duration }} min</b></div>
+        <div class="summary-row" style="border-bottom:none;"><span>Categoría</span><b>{{ s.category }}</b></div>
+        <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+          <a href="{{ url_for('reservar', service=s.id) }}" class="btn btn-primary">Agendar este servicio</a>
+          {% if settings.owner_whatsapp %}
+          <a href="{{ wa_link(settings.owner_whatsapp, 'Hola! Quisiera consultar sobre: ' + s.name + ' 💅') }}" target="_blank" rel="noopener" class="btn btn-wa">Consultar por WhatsApp</a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="stat-mini"><b>${{ '{:,.0f}'.format(s.price).replace(',', '.') }}</b><span>PRECIO {{ (s.price_note or 'BASE')|upper }}</span></div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% set active = 'galeria' %}
+{% block content %}
+<section class="gallery-page" style="padding-top:44px;">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Galería de trabajos</h2>
+      <div class="divider-mini"></div>
+      <p>Algunos de nuestros diseños. Toca cualquier foto para verla en grande.</p>
+    </div>
+    <div class="filters">
+      {% for c in categories %}
+      <a href="{{ url_for('galeria', categoria=c) }}" class="chip {{ 'active' if c==active_cat else '' }}">{{ c }}</a>
+      {% endfor %}
+    </div>
+    {% if images|length == 0 %}
+      <div class="empty-state gallery-empty"><img src="{{ url_for('static', filename='images/nail-editorial.svg') }}" alt="Ilustración de manicure"><div><h3>Muy pronto, nuevos diseños</h3><p>Aún no hay fotos en la galería. Estamos preparando inspiración para ti.</p></div></div>
+    {% else %}
+    <div class="masonry">
+      {% for g in images %}
+      <button class="masonry-item" data-full="{{ url_for('static', filename='uploads/gallery/original/' + g.filename) }}" data-caption="{{ g.caption }}">
+        <img src="{{ url_for('static', filename='uploads/gallery/thumb/' + g.thumb_filename) }}" alt="{{ g.caption or 'Trabajo de uñas' }}" loading="lazy">
+      </button>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose" aria-label="Cerrar">✕</button>
+  <img id="lightboxImg" src="" alt="">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightboxImg');
+  const lbCap = document.getElementById('lightboxCaption');
+  document.querySelectorAll('.masonry-item').forEach(function (el) {
+    el.addEventListener('click', function () {
+      lbImg.src = el.dataset.full;
+      lbCap.textContent = el.dataset.caption || '';
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+  function closeLb() { lb.classList.remove('open'); document.body.style.overflow = ''; lbImg.src=''; }
+  document.getElementById('lightboxClose').onclick = closeLb;
+  lb.addEventListener('click', function (e) { if (e.target === lb) closeLb(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLb(); });
+});
+</script>
+{% endblock %}

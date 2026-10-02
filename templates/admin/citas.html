@@ -1,0 +1,75 @@
+{% extends "admin/base_admin.html" %}
+{% set active = 'citas' %}
+{% block heading %}Citas{% endblock %}
+{% block admin_content %}
+<div class="filters" style="justify-content:flex-start;margin-bottom:22px;">
+  {% for st in estados %}
+  <a href="{{ url_for('admin_citas', estado=st) }}" class="chip {{ 'active' if estado==st else '' }}">{{ st|replace('_',' ') }}</a>
+  {% endfor %}
+</div>
+<div class="table-wrap"><table>
+  <thead><tr><th>ID</th><th>Cliente</th><th>Servicio</th><th>Fecha</th><th>Hora</th><th>Estado</th><th>Imagen de referencia</th><th>Acciones</th></tr></thead>
+  <tbody>
+  {% for b in bookings %}
+  <tr>
+    <td>{{ b.id }}</td>
+    <td>{{ b.client_name }}<br><span class="help-text">{{ b.phone }}</span></td>
+    <td>{{ services_by_id.get(b.service_id, {}).get('name', b.service_name) }}</td>
+    <td>{{ b.date }}</td><td>{{ b.time }}</td>
+    <td><span class="badge-status st-{{ b.status }}">{{ b.status|replace('_',' ') }}</span></td>
+    <td class="reference-cell">
+      {% if b.reference_image %}
+      <a class="admin-reference" href="{{ url_for('admin_reference_image', filename=b.reference_image) }}" target="_blank" rel="noopener" aria-label="Ver imagen de referencia de {{ b.client_name }}">
+        <img src="{{ url_for('admin_reference_image', filename=b.reference_image) }}" alt="Referencia de {{ b.client_name }}" loading="lazy"><span>Ver imagen</span>
+      </a>
+      {% else %}<span class="reference-missing">Sin imagen adjunta</span>{% endif %}
+    </td>
+    <td>
+      <div class="row-actions">
+        {% if b.status == 'PENDIENTE' %}
+        <form class="inline-form" method="POST" action="{{ url_for('admin_cita_estado', bid=b.id) }}">
+          <input type="hidden" name="estado" value="CONFIRMADA">
+          <button class="mini-btn ok" type="submit">Confirmar</button>
+        </form>
+        {% endif %}
+        {% if b.status in ('PENDIENTE','CONFIRMADA') %}
+        <form class="inline-form" method="POST" action="{{ url_for('admin_cita_estado', bid=b.id) }}" onsubmit="return confirm('¿Cancelar esta cita?');">
+          <input type="hidden" name="estado" value="CANCELADA">
+          <button class="mini-btn danger" type="submit">Cancelar</button>
+        </form>
+        {% endif %}
+        {% if b.status == 'CONFIRMADA' %}
+        <form class="inline-form" method="POST" action="{{ url_for('admin_cita_estado', bid=b.id) }}">
+          <input type="hidden" name="estado" value="COMPLETADA">
+          <button class="mini-btn" type="submit">Completada</button>
+        </form>
+        <form class="inline-form" method="POST" action="{{ url_for('admin_cita_estado', bid=b.id) }}">
+          <input type="hidden" name="estado" value="NO_ASISTIO">
+          <button class="mini-btn" type="submit">No asistió</button>
+        </form>
+        <a class="mini-btn wa" target="_blank" rel="noopener" href="{{ confirm_links.get(b.id) }}">Enviar confirmación</a>
+        {% endif %}
+        <button class="mini-btn" onclick="document.getElementById('edit-{{ b.id }}').classList.toggle('show-edit')">Editar</button>
+        <a class="mini-btn wa" target="_blank" rel="noopener" href="{{ contact_links.get(b.id) }}">Contactar</a>
+      </div>
+      <div id="edit-{{ b.id }}" class="admin-card" style="display:none;margin-top:10px;">
+        <form method="POST" action="{{ url_for('admin_cita_editar', bid=b.id) }}">
+          <div class="two-col">
+            <div class="field"><label>Nombre</label><input name="client_name" value="{{ b.client_name }}"></div>
+            <div class="field"><label>Teléfono</label><input name="phone" value="{{ b.phone }}"></div>
+            <div class="field"><label>Fecha</label><input type="date" name="date" value="{{ b.date }}"></div>
+            <div class="field"><label>Hora</label><input type="time" name="time" value="{{ b.time }}"></div>
+          </div>
+          <div class="field"><label>Observaciones</label><textarea name="observations">{{ b.observations }}</textarea></div>
+          <button class="btn btn-primary btn-sm" type="submit">Guardar cambios</button>
+        </form>
+      </div>
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="8" style="text-align:center;color:var(--mocha-dark);padding:30px;">No hay citas en este estado.</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+<style>.show-edit{display:block!important;}</style>
+{% endblock %}

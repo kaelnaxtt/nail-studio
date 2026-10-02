@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ settings.business_name }} — {{ settings.business_suffix }}{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260927-legal-top">
+{% block extra_head %}{% endblock %}
+</head>
+<body id="pageTop">
+<div class="overlay" id="overlay"></div>
+
+<header class="site-header">
+  <div class="inner">
+    <a href="{{ url_for('index') }}" class="brand">
+      <div class="mark">{{ settings.business_name[:1] }}</div>
+      <div><span class="name">{{ settings.business_name }}</span><span class="tagline">{{ settings.business_suffix|upper }}</span></div>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <a href="{{ url_for('index') }}" class="{{ 'active' if active=='home' else '' }}">Inicio</a>
+      <a href="{{ url_for('catalogo') }}" class="{{ 'active' if active=='catalogo' else '' }}">Catálogo</a>
+      <a href="{{ url_for('galeria') }}" class="{{ 'active' if active=='galeria' else '' }}">Galería</a>
+      <a href="{{ url_for('reservar') }}" class="{{ 'active' if active=='reservar' else '' }}">Reservar</a>
+      <a href="{{ url_for('politicas') }}" class="{{ 'active' if active=='politicas' else '' }}">Políticas</a>
+      {% if settings.instagram %}<a href="https://www.instagram.com/{{ settings.instagram|replace('@','') }}/" target="_blank" rel="noopener noreferrer" class="nav-instagram">Instagram</a>{% endif %}
+      {% if session.get('is_admin') %}
+      <a href="{{ url_for('admin_dashboard') }}" class="nav-admin-panel">Panel admin</a>
+      <a href="{{ url_for('logout') }}" class="nav-logout">Cerrar sesión</a>
+      {% elif current_client %}
+      <a href="{{ url_for('perfil') }}" class="nav-client-profile">
+        {% if current_client.avatar %}<img class="nav-avatar" src="{{ url_for('static', filename='uploads/clientes/' + current_client.avatar) }}" alt="Foto de {{ current_client.name }}">
+        {% else %}<span class="nav-avatar nav-avatar-fallback" aria-hidden="true">{{ current_client.name[:1]|upper }}</span>{% endif %}
+        <span class="nav-user-name">{{ current_client.name.split()[0] }}</span>
+      </a>
+      <a href="{{ url_for('logout') }}" class="nav-logout">Cerrar sesión</a>
+      {% else %}
+      <a href="{{ url_for('cuenta') }}" class="nav-account">Iniciar sesión</a>
+      {% endif %}
+      <a href="{{ url_for('reservar') }}" class="nav-cta">Agendar cita</a>
+      {% if settings.owner_whatsapp %}
+      <a href="{{ wa_link(settings.owner_whatsapp, 'Hola! Quisiera más información 💅') }}" target="_blank" rel="noopener" class="nav-whatsapp">WhatsApp</a>
+      {% endif %}
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-label="Menú">☰</button>
+  </div>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="wrap-narrow" style="padding-top:18px;">
+    {% for category, msg in messages %}
+      <div class="flash flash-{{ 'error' if category=='error' else 'ok' }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+
+{% if settings.owner_whatsapp %}
+<a class="wa-float" href="{{ wa_link(settings.owner_whatsapp, 'Hola! Quisiera más información 💅') }}" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.7 1.5 5.3L2 22l4.8-1.5A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .9.9-2.9-.2-.3A8 8 0 1112 20zm4.4-5.9c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1s-.6.8-.7.9-.3.1-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.6-1.2.1-.1 0-.3 0-.4l-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.4.6.2 1 .4 1.4.5.6.2 1.1.1 1.5 0 .5-.1 1.4-.6 1.6-1.1.2-.5.2-1 .1-1.1-.1-.1-.2-.2-.4-.3z"/></svg>
+</a>
+{% endif %}
+
+<footer class="site-footer">
+  <div class="wrap grid">
+    <div>
+      <h5>{{ settings.business_name }} {{ settings.business_suffix }}</h5>
+      <p>{{ settings.tagline }}</p>
+      {% if settings.address %}<p style="margin-top:10px;">{{ settings.address }}</p>{% endif %}
+    </div>
+    <div>
+      <h5 style="font-size:16px;">Explorar</h5>
+      <a href="{{ url_for('catalogo') }}">Catálogo</a>
+      <a href="{{ url_for('reservar') }}">Agendar cita</a>
+      <a href="{{ url_for('politicas') }}">Políticas del servicio</a>
+      <a href="{{ url_for('cookies') }}">Cookies</a>
+      <a href="{{ url_for('terminos') }}">Términos y condiciones</a>
+    </div>
+    <div>
+      <h5 style="font-size:16px;">Contacto y horario</h5>
+      <p>Atención: {{ settings.work_start }} – {{ settings.work_end }}</p>
+      {% if settings.owner_whatsapp %}
+        <a href="{{ wa_link(settings.owner_whatsapp, 'Hola! Quisiera más información 💅') }}" target="_blank" rel="noopener">WhatsApp</a>
+      {% else %}
+        <span style="font-size:12.5px;color:#9A8F7C;">WhatsApp aún no configurado</span>
+      {% endif %}
+      {% if settings.instagram %}<a href="https://instagram.com/{{ settings.instagram|replace('@','') }}" target="_blank" rel="noopener">@{{ settings.instagram|replace('@','') }}</a>{% endif %}
+    </div>
+  </div>
+  <div class="wrap foot-bottom">
+    <span>© {{ current_year }} {{ settings.business_name }}. Todos los derechos reservados.</span>
+    <span>Hecho con 💛 para nuestras clientas</span>
+  </div>
+</footer>
+<a class="back-to-top" href="#pageTop" aria-label="Volver al inicio de la página" title="Volver arriba"><span aria-hidden="true">↑</span></a>
+
+<script src="{{ url_for('static', filename='js/booking.js') }}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

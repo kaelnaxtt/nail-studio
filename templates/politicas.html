@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% set active = 'politicas' %}
+{% block content %}
+<section class="policies-page" style="padding-top:44px;">
+  <div class="wrap-narrow">
+    <div class="policies-art">
+      {% if policies_image %}<img src="{{ url_for('static', filename='uploads/gallery/thumb/' + policies_image.thumb_filename) }}" alt="{{ policies_image.caption or 'Diseño de uñas de la galería' }}">{% else %}<img src="{{ url_for('static', filename='images/nail-editorial.svg') }}" alt="Ilustración de manicura">{% endif %}
+      <div class="section-head" style="text-align:left;margin-left:0;">
+      <span class="editorial-kicker">AURA / INFORMACIÓN</span>
+      <h2>Políticas y aclaraciones del servicio</h2>
+      <div class="divider-mini" style="margin-left:0;"></div>
+      <p>Para brindarte la mejor experiencia y asegurar la calidad de la cita, te pedimos leer detenidamente los siguientes puntos.</p>
+    </div></div>
+    <details class="policy-block" open>
+      <summary><h3>Abono</h3><span class="policy-toggle" aria-hidden="true">+</span></summary>
+      <p>Para asignar y confirmar tu cita se requiere un abono previo de <b>$30.000</b>. Este valor será descontado del costo total de tu servicio el día de la cita.</p>
+      <div class="notice">Importante: en caso de no poder asistir, avisa la cancelación con mínimo 48 horas de anticipación. En caso de incumplimiento, el abono no es reembolsable.</div>
+    </details>
+    <details class="policy-block">
+      <summary><h3>Tarifas</h3><span class="policy-toggle" aria-hidden="true">+</span></summary>
+      <p>Los precios pueden variar dependiendo del largo y la complejidad del diseño elegido, así como del estado actual de tus uñas naturales o si traes producto de otro salón.</p>
+      <p>El valor final se confirmará antes de iniciar el procedimiento.</p>
+    </details>
+    <details class="policy-block">
+      <summary><h3>Garantías</h3><span class="policy-toggle" aria-hidden="true">+</span></summary>
+      <p>Cuentas con garantía de 3 días bajo las siguientes condiciones:</p>
+      <ul>
+        <li><b>Aplica para:</b> desprendimiento prematuro del sistema.</li>
+        <li><b>No aplica para:</b> fracturas, uñas partidas o daños causados por arrancarse el producto o mal uso.</li>
+        <li><b>Decoraciones:</b> no hay garantía en dijes, perlas o diseños 3D, ya que su durabilidad depende totalmente del cuidado y uso que le dé la clienta.</li>
+      </ul>
+    </details>
+    <div style="text-align:center;margin-top:24px;"><a href="{{ url_for('reservar') }}" class="btn btn-primary">Entendido, agendar mi cita</a></div>
+  </div>
+</section>
+{% endblock %}

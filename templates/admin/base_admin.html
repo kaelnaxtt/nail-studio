@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Panel admin — {{ settings.business_name }}{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=admin-legal-top-20260927">
+</head>
+<body id="pageTop">
+<div class="admin-shell">
+  <aside class="admin-side">
+    <a href="{{ url_for('admin_dashboard') }}" class="brand-a">
+      <span class="name serif" style="font-size:20px;">{{ settings.business_name }}</span><br>
+      <span class="tagline" style="color:#C9BFAE;font-size:10px;letter-spacing:2px;">PANEL ADMIN</span>
+    </a>
+    <a href="{{ url_for('admin_dashboard') }}" class="nav-link {{ 'active' if active=='dashboard' else '' }}">Dashboard</a>
+    <a href="{{ url_for('admin_calendario') }}" class="nav-link {{ 'active' if active=='calendario' else '' }}">Calendario</a>
+    <a href="{{ url_for('admin_citas') }}" class="nav-link {{ 'active' if active=='citas' else '' }}">Citas</a>
+    <a href="{{ url_for('admin_clientes') }}" class="nav-link {{ 'active' if active=='clientes' else '' }}">Clientes</a>
+    <a href="{{ url_for('admin_servicios') }}" class="nav-link {{ 'active' if active=='servicios' else '' }}">Servicios</a>
+    <a href="{{ url_for('admin_galeria') }}" class="nav-link {{ 'active' if active=='galeria' else '' }}">Galería</a>
+    <a href="{{ url_for('admin_horarios') }}" class="nav-link {{ 'active' if active=='horarios' else '' }}">Horarios</a>
+    <a href="{{ url_for('admin_config') }}" class="nav-link {{ 'active' if active=='config' else '' }}">Configuración</a>
+    <div class="logout">
+      <a href="{{ url_for('logout') }}">Cerrar sesión</a>
+      <a href="{{ url_for('cookies') }}">Cookies</a>
+      <a href="{{ url_for('terminos') }}">Términos y condiciones</a>
+      <a href="{{ url_for('index') }}" style="opacity:.6;">Ver sitio público</a>
+    </div>
+  </aside>
+  <main class="admin-main">
+    <div class="admin-topbar"><h1>{% block heading %}{% endblock %}</h1></div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="flash flash-{{ 'error' if category=='error' else 'ok' }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block admin_content %}{% endblock %}
+  </main>
+</div>
+<a class="back-to-top back-to-top-admin" href="#pageTop" aria-label="Volver al inicio de la página" title="Volver arriba"><span aria-hidden="true">↑</span></a>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

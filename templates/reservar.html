@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% set active = 'reservar' %}
+{% block content %}
+<section class="booking-section booking-page" style="padding-top:44px;">
+  <div class="wrap-narrow">
+    <div class="booking-intro-art">
+      {% if booking_gallery %}
+      <div class="booking-gallery-collage" aria-label="Diseños de uñas de la galería">
+        {% for photo in booking_gallery %}<img src="{{ url_for('static', filename='uploads/gallery/thumb/' + photo.thumb_filename) }}" alt="{{ photo.caption or 'Diseño de uñas de la galería' }}" {% if not loop.first %}loading="lazy"{% endif %}>{% endfor %}
+      </div>
+      {% else %}<img src="{{ url_for('static', filename='images/nail-editorial.svg') }}" alt="Ilustración de uñas para inspirar tu próxima cita">{% endif %}
+      <div><div class="section-head">
+      <h2>Reserva tu cita</h2>
+      <div class="divider-mini"></div>
+    </div></div></div>
+
+    <div class="steps-bar">
+      <div class="step-dot"><div class="num">1</div><label>Servicio</label></div>
+      <div class="step-dot"><div class="num">2</div><label>Fecha</label></div>
+      <div class="step-dot"><div class="num">3</div><label>Hora</label></div>
+      <div class="step-dot"><div class="num">4</div><label>Tus datos</label></div>
+      <div class="step-dot"><div class="num">5</div><label>Confirmar</label></div>
+    </div>
+
+    <form id="bookingForm" class="card" method="POST" action="{{ url_for('api_crear_reserva') }}"
+          enctype="multipart/form-data" data-preselect="{{ preselect or '' }}">
+
+      <!-- STEP 1: servicio -->
+      <div class="wiz-step">
+        {% for c in categories %}
+        <h4 style="font-size:15px;color:var(--gold);margin:18px 0 10px;">{{ c }}</h4>
+        <div class="svc-pick">
+          {% for s in services if s.category == c %}
+          <label class="service-choice" data-label="{{ s.name }}" data-price="{{ s.price }}">
+            <input type="radio" name="service_id" value="{{ s.id }}" {% if preselect and preselect|string == s.id|string %}checked{% endif %}>
+            <span class="service-choice-image">
+              {% if s.image %}
+                <img src="{{ url_for('static', filename='uploads/services/' + s.image) }}" alt="{{ s.name }}" loading="lazy">
+              {% else %}
+                <img src="{{ url_for('static', filename='images/nail-editorial.svg') }}" alt="Inspiración de uñas para {{ s.name }}" loading="lazy">
+              {% endif %}
+            </span>
+            <span class="service-choice-copy"><b>{{ s.name }}</b>
+              <span class="meta">{% if s.price_note %}{{ s.price_note }} {% endif %}${{ '{:,.0f}'.format(s.price).replace(',', '.') }} · {{ s.duration }} min</span>
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- STEP 2: fecha -->
+      <div class="wiz-step">
+        <label class="calendar-label" for="dateInput">Elige una fecha disponible</label>
+        <div class="booking-calendar" id="bookingCalendar" data-today="{{ today }}">
+          <div class="calendar-head">
+            <button type="button" class="calendar-nav" id="calendarPrev" aria-label="Mes anterior">‹</button>
+            <h3 id="calendarTitle" aria-live="polite"></h3>
+            <button type="button" class="calendar-nav" id="calendarNext" aria-label="Mes siguiente">›</button>
+          </div>
+          <div class="calendar-weekdays" aria-hidden="true"><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span></div>
+          <div class="calendar-days" id="calendarDays" aria-live="polite"><p class="help-text">Cargando disponibilidad…</p></div>
+          <div class="calendar-legend"><span><i class="legend-dot available"></i>Con cupos</span><span><i class="legend-dot booked"></i>Con horas ocupadas</span><span><i class="legend-dot full"></i>Agenda llena</span><span><i class="legend-dot closed"></i>Cerrado</span></div>
+        </div>
+        <input type="hidden" id="dateInput" name="date" required>
+        <p class="help-text" id="calendarHint">Los días con agenda llena están desactivados. Al elegir un día, verás qué horas siguen libres y cuáles ya están ocupadas.</p>
+      </div>
+
+      <!-- STEP 3: hora -->
+      <div class="wiz-step">
+        <p style="color:var(--mocha-dark);font-size:13.5px;margin-bottom:16px;">Elige un horario disponible para la fecha seleccionada.</p>
+        <div class="slot-grid" id="slotWrap">
+          <p class="help-text">Primero selecciona una fecha en el paso anterior.</p>
+        </div>
+        <input type="hidden" id="timeHidden" name="time">
+      </div>
+
+      <!-- STEP 4: datos -->
+      <div class="wiz-step">
+        <div class="field"><label>Nombre completo</label><input id="nameInput" name="name" type="text" placeholder="Ej. María Pérez" minlength="2" maxlength="100" autocomplete="name" value="{{ client.name if client else '' }}" required></div>
+        <div class="field"><label>Número de WhatsApp</label><input id="phoneInput" name="phone" type="tel" placeholder="Ej. 3001234567" inputmode="tel" autocomplete="tel" minlength="10" maxlength="16" value="{{ client.phone[2:] if client and client.phone.startswith('57') else (client.phone if client else '') }}" required></div>
+        <div class="field">
+          <label>Adicionales (opcional)</label>
+          <div class="addon-list">
+            {% for a in addons %}
+            <label class="addon-row">
+              {% if a.image %}<img class="addon-image" src="{{ url_for('static', filename='uploads/services/' + a.image) }}" alt="" loading="lazy">{% else %}<span class="addon-image addon-image-empty" aria-hidden="true">✦</span>{% endif %}
+              <span class="addon-copy">
+                <span class="an">{{ a.name }}</span>
+                <span class="ap">{% if a.price_note %}{{ a.price_note }} {% endif %}${{ '{:,.0f}'.format(a.price).replace(',', '.') }}</span>
+              </span>
+              <input type="checkbox" name="add_ons" value="{{ a.id }}" data-name="{{ a.name }}" data-price="{{ a.price }}">
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="field"><label>Observaciones (opcional)</label><textarea id="obsInput" name="observations" placeholder="Ej. Diseño de referencia, alergias, forma preferida..."></textarea></div>
+        <div class="field reference-upload-field"><label>Imagen de referencia (recomendada, máx. 4MB)</label><input type="file" name="reference_image" accept="image/*"><div class="reference-upload-note" role="note"><strong>Adjunta una foto del diseño que quieres.</strong><span>Quedará guardada con tu cita para que el estudio pueda verla. Si luego avisas por WhatsApp desde el botón, tendrás que adjuntar la foto también en el chat; WhatsApp no la agrega automáticamente.</span></div></div>
+      </div>
+
+      <!-- STEP 5: confirmar -->
+      <div class="wiz-step">
+        <div id="summaryBox"></div>
+        <div class="notice" style="margin-top:16px;">Recuerda: para confirmar tu cita se requiere un abono de $30.000. El valor final puede variar según el diseño.</div>
+      </div>
+
+      <div class="wizard-nav">
+        <button type="button" class="btn btn-ghost" id="wizBack">Atrás</button>
+        <button type="button" class="btn btn-primary" id="wizNext" disabled>Continuar</button>
+        <button type="submit" class="btn btn-rose" id="wizSubmit" style="display:none;">Solicitar cita</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

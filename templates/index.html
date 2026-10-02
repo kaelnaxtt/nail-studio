@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% set active = 'home' %}
+{% block content %}
+<section class="hero">
+  <div class="wrap grid">
+    <div>
+      <div class="eyebrow-line"><span class="dash"></span> MANICURE, PEDICURE &amp; NAIL ART</div>
+      <h1>{{ settings.hero_title }}</h1>
+      <p class="lead">{{ settings.hero_subtitle }}</p>
+      <div class="actions">
+        <a href="{{ url_for('reservar') }}" class="btn btn-primary">Agendar cita</a>
+        <a href="{{ url_for('catalogo') }}" class="btn btn-outline">Ver catálogo</a>
+        {% if settings.owner_whatsapp %}
+        <a href="{{ wa_link(settings.owner_whatsapp, 'Hola! Quisiera más información 💅') }}" target="_blank" rel="noopener" class="btn btn-wa">WhatsApp</a>
+        {% endif %}
+      </div>
+    </div>
+    {% if highlights %}
+    <div class="hero-visual has-photo" style="--hero-image:url('{{ url_for('static', filename='uploads/gallery/original/' + highlights[0].filename) }}')"></div>
+    {% else %}
+    <div class="hero-visual hero-art"><img src="{{ url_for('static', filename='images/nail-editorial.svg') }}" alt="Diseño editorial de uñas para inspirar tu próxima cita"></div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="services-overview">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Nuestros servicios</h2>
+      <div class="divider-mini"></div>
+      <p>Cada detalle está pensado para resaltar tu estilo.</p>
+    </div>
+    <div class="cat-grid">
+      {% for c in categories %}
+      {% set category_product = services|selectattr('category', 'equalto', c)|first %}
+      <div class="cat-card">
+        {% if category_product and category_product.image %}
+          <img class="cat-art" src="{{ url_for('static', filename='uploads/services/' + category_product.image) }}" alt="{{ category_product.name }} — {{ c }}" loading="lazy">
+        {% elif highlights %}
+          <img class="cat-art" src="{{ url_for('static', filename='uploads/gallery/thumb/' + highlights[0].thumb_filename) }}" alt="Diseño de uñas {{ c }}" loading="lazy">
+        {% else %}
+          <img class="cat-art" src="{{ url_for('static', filename='images/nail-editorial.svg') }}" alt="Diseño de uñas {{ c }}" loading="lazy">
+        {% endif %}
+        <h3>{{ c }}</h3>
+        <p>Servicios de la categoría {{ c }}, con precios y duración detallados en el catálogo.</p>
+        <a href="{{ url_for('catalogo', categoria=c) }}">Explorar servicios</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% if highlights %}
+<section class="featured-work">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Trabajos destacados</h2>
+      <div class="divider-mini"></div>
+      <p>Una muestra de nuestro trabajo. Puedes ver la galería completa cuando quieras.</p>
+    </div>
+    <div class="work-strip">
+      {% for g in highlights %}
+      <a href="{{ url_for('galeria') }}" class="work-tile">
+        <img src="{{ url_for('static', filename='uploads/gallery/thumb/' + g.thumb_filename) }}" alt="{{ g.caption or 'Trabajo de uñas' }}" loading="lazy">
+      </a>
+      {% endfor %}
+    </div>
+    <div style="text-align:center;margin-top:24px;"><a href="{{ url_for('galeria') }}" class="btn btn-outline btn-sm">Ver galería completa</a></div>
+  </div>
+</section>
+{% endif %}
+
+<section class="about-aura">
+  <div class="wrap about-grid">
+    <div class="about-copy">
+      <span class="editorial-kicker">EL ESTUDIO</span>
+      <h2>Un espacio para cuidar cada detalle.</h2>
+    </div>
+    <div class="about-copy about-description">
+      <p>En AURA, la belleza se vive con calma. Creamos una experiencia personalizada donde el cuidado, el diseño y la elegancia se encuentran en cada cita.</p>
+      <a href="{{ url_for('catalogo') }}" class="about-link">Descubre nuestros servicios</a>
+    </div>
+  </div>
+</section>
+
+<section class="policy-band">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Lo que debes saber</h2>
+      <div class="divider-mini"></div>
+      <p>Unas breves aclaraciones para que tu cita salga perfecta.</p>
+    </div>
+    <div class="policy-cards">
+      <div class="policy-card"><h4>Abono</h4><p>Se requiere un abono de $30.000 para confirmar tu cita, descontado del valor total el día del servicio.</p></div>
+      <div class="policy-card"><h4>Tarifas</h4><p>El valor final puede variar según el largo, la complejidad del diseño y el estado de tus uñas.</p></div>
+      <div class="policy-card"><h4>Garantía</h4><p>3 días de garantía frente a desprendimiento prematuro del sistema, bajo condiciones.</p></div>
+    </div>
+    <div style="text-align:center;margin-top:28px;"><a href="{{ url_for('politicas') }}" class="btn btn-outline btn-sm">Leer políticas completas</a></div>
+  </div>
+</section>
+
+<section class="booking-section">
+  <div class="wrap-narrow booking-cta" style="text-align:center;">
+    <h2>¿Lista para tu próxima cita?</h2>
+    <p style="color:var(--mocha-dark);margin-top:12px;">Elige tu servicio, escoge fecha y hora, y nosotras nos encargamos del resto.</p>
+    <div style="margin-top:24px;"><a href="{{ url_for('reservar') }}" class="btn btn-rose">Agendar cita ahora</a></div>
+  </div>
+</section>
+{% endblock %}

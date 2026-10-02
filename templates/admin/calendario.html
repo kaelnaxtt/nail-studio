@@ -1,0 +1,45 @@
+{% extends "admin/base_admin.html" %}
+{% set active = 'calendario' %}
+{% block heading %}Calendario{% endblock %}
+{% block admin_content %}
+<div class="admin-card">
+  <div class="month-head">
+    <a href="{{ url_for('admin_calendario', anio=prev_anio, mes=prev_mes, dia=dia_sel) }}">‹</a>
+    <b class="serif" style="font-size:19px;">{{ month_name }} {{ anio }}</b>
+    <a href="{{ url_for('admin_calendario', anio=next_anio, mes=next_mes, dia=dia_sel) }}">›</a>
+  </div>
+  <div class="dow-row"><span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span></div>
+  <div class="day-grid">
+    {% for i in range(first_weekday) %}<div class="day-cell blank"></div>{% endfor %}
+    {% for d in range(1, days_in_month + 1) %}
+      {% set iso = '%04d-%02d-%02d' % (anio, mes, d) %}
+      <div class="day-cell {{ 'sel' if iso == dia_sel else '' }}">
+        <a href="{{ url_for('admin_calendario', anio=anio, mes=mes, dia=iso) }}">
+          {{ d }}{% if counts.get(iso) %}<span style="font-size:9px;">●{{ counts.get(iso) }}</span>{% endif %}
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+<div class="admin-card">
+  <h3>Citas del {{ human_date(dia_sel) }}</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Hora</th><th>Cliente</th><th>Servicio</th><th>Referencia</th><th>Estado</th></tr></thead>
+    <tbody>
+    {% for b in day_bookings %}
+      <tr>
+        <td>{{ b.time }}</td><td>{{ b.client_name }}</td>
+        <td>{{ services_by_id.get(b.service_id, {}).get('name', b.service_name) }}</td>
+        <td class="reference-cell">
+          {% if b.reference_image %}<a class="admin-reference admin-reference-small" href="{{ url_for('admin_reference_image', filename=b.reference_image) }}" target="_blank" rel="noopener" aria-label="Ver imagen de referencia de {{ b.client_name }}"><img src="{{ url_for('admin_reference_image', filename=b.reference_image) }}" alt="Referencia de {{ b.client_name }}" loading="lazy"><span>Ver</span></a>
+          {% else %}<span class="reference-missing">Sin imagen</span>{% endif %}
+        </td>
+        <td><span class="badge-status st-{{ b.status }}">{{ b.status|replace('_',' ') }}</span></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" style="text-align:center;color:var(--mocha-dark);">Sin citas este día.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "admin/base_admin.html" %}
+{% set active = 'clientes' %}
+{% block heading %}Cliente{% endblock %}
+{% block admin_content %}
+<a class="btn btn-ghost btn-sm" style="margin-bottom:16px;display:inline-flex;" href="{{ url_for('admin_clientes') }}">← Volver a clientes</a>
+<div class="admin-card">
+  <h3>{{ name }}</h3>
+  <p class="help-text">{{ phone }}</p>
+  <a class="btn btn-wa btn-sm" style="margin-top:10px;" target="_blank" rel="noopener"
+     href="{{ wa_link(phone, 'Hola ' + name + ', te escribimos de ' + settings.business_name + ' 💅') }}">Escribir por WhatsApp</a>
+</div>
+<div class="admin-card">
+  <h3>Historial de citas</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Fecha</th><th>Servicio</th><th>Estado</th><th>Observaciones</th></tr></thead>
+    <tbody>
+    {% for b in bookings %}
+      <tr>
+        <td>{{ b.date }} {{ b.time }}</td>
+        <td>{{ services_by_id.get(b.service_id, {}).get('name', b.service_name) }}</td>
+        <td><span class="badge-status st-{{ b.status }}">{{ b.status|replace('_',' ') }}</span></td>
+        <td>{{ b.observations or '—' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</div>
+{% endblock %}
